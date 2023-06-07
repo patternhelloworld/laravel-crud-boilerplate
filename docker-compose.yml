@@ -1,0 +1,73 @@
+version: "3.8"
+services:
+  #Laravel Service
+  lr_app:
+    container_name: lr_app
+    restart: always
+    stdin_open: true
+    tty: true
+    working_dir: /var/www/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      XDEBUG_CONFIG: "idekey=IDE_DEBUG"
+      PHP_IDE_CONFIG: "serverName=laravel_react_app"
+    volumes:
+      - .:/var/www/app
+    depends_on:
+      - lr_database
+    links:
+      - lr_database
+    networks:
+      - lr_network
+
+  #DB Service
+  lr_database:
+    image: mariadb:latest
+    container_name: lr_database
+    restart: always
+    working_dir: /etc/mysql
+    tty: true
+    environment:
+      MYSQL_DATABASE: laravel_crud_boilerplate
+      MYSQL_USER: tester
+      MYSQL_ROOT_PASSWORD: test1235
+      MYSQL_PASSWORD: test1235
+    ports:
+      - 3333:3306
+    volumes:
+      - ./.docker/db/data:/var/lib/mysql
+      - ./.docker/db/log:/var/log/mysql
+      #- ./.docker/db/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - lr_network
+
+  #Nginx Service
+  lr_server:
+    image: nginx:alpine
+    container_name: lr_server
+    restart: always
+    stdin_open: true
+    tty: true
+    ports:
+      - 8100:8080
+    volumes:
+      - .:/var/www/app
+      - ./.docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    working_dir: /var/www
+    depends_on:
+      - lr_app
+    networks:
+      - lr_network
+
+#Docker Networks
+networks:
+  lr_network:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
