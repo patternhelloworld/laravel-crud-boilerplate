@@ -28,7 +28,7 @@ class CourseController extends Controller
 
     /**
      *
-     * 관리자가 Course 를 비활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로 막아주어야 함)
+     * 관리자가 Course 를 비활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로  되어야 함.)
      * @param $id
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Throwable
@@ -39,10 +39,36 @@ class CourseController extends Controller
 
         try {
 
-            // This is "Soft Delete".
+            // These are all "Soft Delete".
             Course::find($id)->delete();
             Enrollment::where('course_id', $id)->delete();
             Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->delete();
+
+            DB::commit();
+
+        }catch (\Throwable $e){
+            DB::rollBack();
+            throw $e;
+        }
+        return response([], 200);
+    }
+
+    /**
+     *
+     * 관리자가 Course 를  활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로 되어야 함.)
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @throws \Throwable
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            Course::find($id)->restore();
+            Enrollment::where('course_id', $id)->restore();
+            Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->restore();
 
             DB::commit();
 

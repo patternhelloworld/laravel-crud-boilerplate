@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\ArticleFactory;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,11 +40,6 @@ class Course extends Model
 
     ];
 
-    protected static function newFactory(): ArticleFactory
-    {
-        return ArticleFactory::new();
-    }
-
     /**
      * Load all for admin and paginate
      *
@@ -57,106 +51,19 @@ class Course extends Model
             ->paginate();
     }
 
-    /**
-     * Load all for logged in user and paginate
-     *
-     * @param $user_id
-     *
-     * @return Paginator
-     */
-    public static function loadAllMine(int $user_id): Paginator
-    {
-        return static::latest()
-            ->mine($user_id)
-            ->paginate();
-    }
 
-    /**
-     * load all published with pagination
-     *
-     * @return Paginator
-     */
-    public static function loadAllPublished(): Paginator
-    {
-        return static::with([
-            'user' => function (BelongsTo $query) {
-                $query->select('id', 'name');
-            },
-        ])
-            ->latest()
-            ->published()
-            ->paginate();
-    }
-
-    /**
-     * load one published
-     *
-     * @param string $slug
-     *
-     * @return Article
-     */
-    public static function loadPublished(string $slug): Course
-    {
-        return static::with([
-            'user' => function (BelongsTo $query) {
-                $query->select('id', 'name');
-            },
-        ])
-            ->published()
-            ->where('slug', $slug)
-            ->firstOrFail();
-    }
-
-    /**
-     * Add query scope to get only published articles
-     *
-     * @param Builder $query
-     *
-     * @return Builder
-     */
-    public function scopePublished(Builder $query): Builder
-    {
-        return $query->where([
-            'published' => true,
-        ]);
-    }
-
-    /**
-     * Load only articles related with the user id
-     *
-     * @param Builder $query
-     * @param int $user_id
-     *
-     * @return Builder
-     */
-    public function scopeMine(Builder $query, int $user_id): Builder
-    {
-        return $query->where('user_id', $user_id);
-    }
-
-
-    public function tutor()
+    public function tutor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'tutor_id');
     }
 
-    public function enrollments()
+    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Enrollment::class, 'course_id');
     }
 
-    /**
-     * Relationship between articles and user
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 
-
-    public static function getAvailableCourses(string $language = null, string $type = null)
+    public static function getAvailableCourses(string $language = null, string $type = null): ?\Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = self::query()->where('available', true);
 
