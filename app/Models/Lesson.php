@@ -10,8 +10,9 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Enrollment extends Model
+class Lesson extends Model
 {
+    use SoftDeletes;
     use HasFactory;
 
     /**
@@ -19,16 +20,9 @@ class Enrollment extends Model
      *
      * @var string
      */
-    protected $table = 'enrollments';
+    protected $table = 'lessons';
 
-    protected $fillable = ['students_id', 'course_id', ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = ['deleted_at'];
+    protected $fillable = ['enrollment_id'];
 
     /**
      * The attributes that should be cast to native types.
@@ -93,7 +87,7 @@ class Enrollment extends Model
      *
      * @return Article
      */
-    public static function loadPublished(string $slug): Enrollment
+    public static function loadPublished(string $slug): Lesson
     {
         return static::with([
             'user' => function (BelongsTo $query) {
@@ -140,25 +134,5 @@ class Enrollment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function student()
-    {
-        return $this->belongsTo(User::class, 'student_id');
-    }
-
-    public function course()
-    {
-        return $this->belongsTo(Course::class, 'course_id');
-    }
-
-    public function lessons()
-    {
-        return $this->hasMany(Lesson::class, 'enrollment_id');
-    }
-
-    public static function getOne(int $course_id, int $student_id) : ?Enrollment
-    {
-        return static::where('course_id', $course_id)->where('student_id', $student_id)->first();
     }
 }

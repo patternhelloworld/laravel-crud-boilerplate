@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
@@ -40,7 +41,11 @@ class RegisterController extends Controller
 
             return json_decode((string)$response->getBody(), true);
         } catch (\Exception $e) {
-            dd($e->getMessage(), $e->getCode(), $e->getTrace());
+
+            // 다만 항상 invalid credential 오류라는 것을 보장하지 못하기 때문에... 다른 종류의 오류라면 서버에서 확인이 필요할 것으로 보임.
+            Log::error($e->getMessage());
+
+            // 원작자가 보안을 고려해 이와 같이 처리한 것으로 보임.
             return response()->json([
                 "error" => "invalid_credentials",
                 "message" => "The user credentials were incorrect."

@@ -1,68 +1,54 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# Laravel CRUD Boilerplate
 
-## Laravel 8 and React 17 boilerplate
-There are two different ways to run this demo
+## Overview & Installation
 
-Please follow the guide.
+Laravel CRUD Boilerplate is a modified version of a MIT licensed sample project, laravel-react ( https://github.com/moeen-basra/laravel-react ).
+I have removed front-end things and added some more convenient things, such as,
 
-## Prerequisite
+```shell
+# For Git cloning, if you use WIN WSL2, I strongly recommend cloning on a WSL folder `\\wsl$\Ubuntu\home` not `c:\`. You use Mac, I don't know, as I don't have one. T.T
 
-1. Make sure you have [composer](https://getcomposer.org/download/) installed.
-2. Make sure you have latest stable version of [node](https://nodejs.org/en/download/) installed.
+git clone https://github.com/Andrew-Kang-G/laravel-crud-boilerplate
+cp .env.example.local .env
 
-### Option 1
+# on .env, you need to modify just one thing. "HOST_IP" (WIN WSL2 : host.docker.internal, Mac : docker.for.mac.localhost)
 
-1. `git clone`
-2. `create a .env file copy content from .env.example and update the values`
-3. `composer install && composer update`
-4. `php artisan cron:refresh-database`
-5. if npm version < 7 `npm install && npm run dev` else `npm install --legacy-peer-deps && npm run dev`
-6. `php artisan key:gen`
-7. `php artisan serve`
-
-### Option 2
-
-## Prerequisite
-Make sure you have [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/) installed on you machine.
-
-1. `git clone`
-2. `create a .env file copy content from .env.docker and do not make any change`
-
-run following command in terminal / power shell
-```
+docker-compose build
 docker-compose up -d
+
+# You can see the building process by running 'docker logs -f lr_app'.
+# You can get into the App container by running 'docker exec -it lr_app bash'. (As Dockerfile has been built as a ROOT user, you can do anything inside the container. However, considering security, add USER www-data on Dockerfile on production environments. 
 ```
 
-when docker will finish building the containers, access the "laravel-crud-boilerplate-app" container using following command
+## Prerequisite
 
-`docker exec -it lr_app sh`
+For me, on WSL2,
 
-now you will be inside container
+- Docker version 20.10.23
+- Docker Compose version v2.15.1
 
-run following commands
-1. `composer install && composer update`
-2. `php artisan cron:refresh-database`
-3. `php artisan key:gen`
-4. if npm version < 7 `npm install && npm run dev` else `npm install --legacy-peer-deps && npm run dev`
+## Database
 
-open browser and check the following address
+- It is automatically up as running `docker-compose up -d` above. 
+- If you need to persist data continually, just uncomment `# ./.docker/db/data:/var/lib/mysql` on the docker-compose.yml.
+- The transaction isolation level is at 'READ-COMMITTED' on the docker-compose.yml.
 
-`http://localhost:8100`
+## Debugging
+On the 'docker-compose.yml', 
+`PHP_IDE_CONFIG: "serverName=laravel-crud-boilerplate"` And
+![img.png](/reference/readme/img.png)
 
-TODO:
+must be the same, 'laravel-crud-boilerplate'.
 
-- [x] Add Redux
-- [x] Add Laravel Sanctum for authentication
-- [x] User Login
-- [x] User Register
-- [x] Users Crud
-- [x] Articles Crud
-- [x] Form validation Client and Server
-- [x] Reset Password
-- [x] Tests
-- [x] Upgrade to Laravel 7
-- [x] Upgrade to React 16.13
-- [x] docker
+Additionally, set the port to be 9002.
+![img2.png](/reference/readme/img2.png)
+
+## Test APIs
+Postman API files are on `./reference/postman`
+
+## Test Codes
+
+T.T. Not yet.
 
 
 

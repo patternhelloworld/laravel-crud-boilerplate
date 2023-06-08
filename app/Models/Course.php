@@ -10,8 +10,10 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Enrollment extends Model
+class Course extends Model
 {
+    // use soft delete instead of permanent delete
+    use SoftDeletes;
     use HasFactory;
 
     /**
@@ -19,7 +21,7 @@ class Enrollment extends Model
      *
      * @var string
      */
-    protected $table = 'enrollments';
+    protected $table = 'courses';
 
     protected $fillable = ['students_id', 'course_id', ];
 
@@ -93,7 +95,7 @@ class Enrollment extends Model
      *
      * @return Article
      */
-    public static function loadPublished(string $slug): Enrollment
+    public static function loadPublished(string $slug): Course
     {
         return static::with([
             'user' => function (BelongsTo $query) {
@@ -132,6 +134,17 @@ class Enrollment extends Model
         return $query->where('user_id', $user_id);
     }
 
+
+    public function tutor()
+    {
+        return $this->belongsTo(User::class, 'tutor_id');
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'course_id');
+    }
+
     /**
      * Relationship between articles and user
      *
@@ -142,23 +155,28 @@ class Enrollment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function student()
+
+    public static function getAvailableCourses(string $language = null, string $type = null)
     {
-        return $this->belongsTo(User::class, 'student_id');
+        $query = self::query()->where('available', true);
+
+        if ($language) {
+            $query->where('language', $language);
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        return $query->latest()->paginate();
     }
 
-    public function course()
+    public static function getAvailableOne(string $id = null)
     {
-        return $this->belongsTo(Course::class, 'course_id');
-    }
+        $now = now();
 
-    public function lessons()
-    {
-        return $this->hasMany(Lesson::class, 'enrollment_id');
-    }
+        return self::query()->where('available_from', '<=', $now)
+            ->where('available_until', '>=', $now)->find($id);
 
-    public static function getOne(int $course_id, int $student_id) : ?Enrollment
-    {
-        return static::where('course_id', $course_id)->where('student_id', $student_id)->first();
     }
 }
