@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\ArticleFactory;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -64,7 +63,7 @@ class Course extends Model
     }
 
 
-    public static function getAvailableCourses(string $language = null, string $type = null)
+    public static function getAvailableCourses(string $language = null, string $type = null): ?\Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = self::query()->where('available', true);
 
