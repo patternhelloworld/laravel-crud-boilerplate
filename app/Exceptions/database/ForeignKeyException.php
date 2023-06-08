@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\database;
 
 use Exception;
 
-class ForeignKeyException extends Exception
+class ForeignKeyException extends \RuntimeException
 {
     public function __construct($message = null)
     {

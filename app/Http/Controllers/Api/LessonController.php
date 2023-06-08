@@ -3,17 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Exceptions\ForeignKeyException;
-use App\Exceptions\RowNotFoundException;
+use App\Exceptions\database\ForeignKeyException;
+use App\Exceptions\database\RowNotFoundException;
+use App\Http\Controllers\Controller;
 use App\Http\DTOs\LessonStoreDTO;
 use App\Http\Requests\LessonStoreRequest;
-
-use App\Http\Controllers\Controller;
-use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
 
 class LessonController extends Controller
 {

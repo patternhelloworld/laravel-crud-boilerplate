@@ -42,16 +42,16 @@ docker-php-ext-install \
     pdo_mysql
 
 # Install Xdebug
-# mac : docker.for.mac.localhost / win : host.docker.internal
+# ${HOST_IP} : mac : docker.for.mac.localhost / win : host.docker.internal
 pecl install xdebug-3.0.2
-  echo "" >> /var/log/xdebug.log && chmod 777 /var/log/xdebug.log && echo -e "xdebug.log_level=1 \n xdebug.log=/var/log/xdebug.log \n zend_extension = xdebug.so \n xdebug.idekey=PHPSTORM \n xdebug.discover_client_host=0 \n xdebug.default_enable = 1 \n xdebug.remote_handler = "dbgp" \n xdebug.remote_port=9002 \n xdebug.client_host="host.docker.internal" \n xdebug.client_port=9002 \n xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini
+  echo "" >> /var/log/xdebug.log && chmod 777 /var/log/xdebug.log && echo -e "xdebug.log_level=1 \n xdebug.log=/var/log/xdebug.log \n zend_extension = xdebug.so \n xdebug.idekey=PHPSTORM \n xdebug.discover_client_host=0 \n xdebug.default_enable = 1 \n xdebug.remote_handler = "dbgp" \n xdebug.remote_port=9002 \n xdebug.client_host=${HOST_IP} \n xdebug.client_port=9002 \n xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install composer
 cd /tmp && php -r "readfile('https://getcomposer.org/installer');" | php && \
 	mv composer.phar /usr/bin/composer && \
 	chmod +x /usr/bin/composer
 
-# apk del $TMP
+apk del $TMP
 
 # Install PHPUnit
 curl -sSL -o /usr/bin/phpunit https://phar.phpunit.de/phpunit.phar && chmod +x /usr/bin/phpunit

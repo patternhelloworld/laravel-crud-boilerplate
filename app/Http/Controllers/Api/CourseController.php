@@ -39,6 +39,7 @@ class CourseController extends Controller
 
         try {
 
+            // This is "Soft Delete".
             Course::find($id)->delete();
             Enrollment::where('course_id', $id)->delete();
             Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->delete();

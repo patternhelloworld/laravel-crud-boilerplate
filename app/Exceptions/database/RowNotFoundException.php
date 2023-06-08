@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\database;
 
 use Exception;
 
-class RowNotFoundException extends Exception
+class RowNotFoundException extends \RuntimeException
 {
     public function __construct($message = null)
     {
