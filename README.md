@@ -30,7 +30,7 @@ For me, on WSL2,
 ## Database
 
 - It is automatically up as running `docker-compose up -d` above. 
-- If you need to persist data continually, just uncomment `# ./.docker/db/data:/var/lib/mysql` on the docker-compose.yml.
+- If you need to persist data continually, just uncomment `# ./.docker/db/data:/var/lib/mysql` AND comment `./.docker/db/dump.sql:/docker-entrypoint-initdb.d/dump.sql` on the docker-compose.yml.
 - The transaction isolation level is at 'READ-COMMITTED' on the docker-compose.yml.
 
 ## Debugging
