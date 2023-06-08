@@ -40,7 +40,7 @@ class RegisterController extends Controller
 
             return json_decode((string)$response->getBody(), true);
         } catch (\Exception $e) {
-            dd($e->getMessage(), $e->getCode(), $e->getTrace());
+
             return response()->json([
                 "error" => "invalid_credentials",
                 "message" => "The user credentials were incorrect."
