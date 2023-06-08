@@ -26,7 +26,8 @@
     "laravel/sanctum": "^2.8",
     "laravel/tinker": "^2.5",
     "laravel/ui": "^3.1",
-    "pragmarx/health": "^2.0"
+    "pragmarx/health": "^2.0",
+    "spatie/data-transfer-object": "^2.8"
   },
   "require-dev": {
     "facade/ignition": "^2.5",

@@ -2,135 +2,80 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Article;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Http\DTOs\CourseIndexDTO;
+use App\Http\Requests\CourseIndexRequest;
+use App\Models\Course;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ArticleRequest;
+use App\Models\Enrollment;
+use App\Models\Lesson;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a paginated listing of courses
      *
-     * @param Request $request
-     * @return LengthAwarePaginator|mixed
+     * @param CourseIndexRequest $request
+     * @return LengthAwarePaginator
      */
-    public function index(Request $request)
+    public function index(CourseIndexRequest $request): LengthAwarePaginator
     {
-        if ($request->user()->is_admin) {
-            return Article::loadAll();
-        }
-        return Article::loadAllMine($request->user()->id);
+        $courseIndexDTO = CourseIndexDTO::fromRequest($request);
+        return Course::getAvailableCourses($courseIndexDTO->getLanguage(), $courseIndexDTO->getType());
     }
 
-    /**
-     * get all published articles
-     *
-     * @return mixed
-     */
-    public function publishedArticles()
-    {
-        return Article::loadAllPublished();
-    }
 
     /**
-     * Get single published article
      *
-     * @param $slug
-     * @return mixed
-     */
-    public function publishedArticle($slug)
-    {
-        return Article::loadPublished($slug);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param ArticleRequest $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(ArticleRequest $request)
-    {
-        $user = $request->user();
-
-        $article = new Article($request->validated());
-        $article->slug = Str::slug($request->get('title'));
-
-        $user->articles()->save($article);
-
-        return response()->json($article, 201);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request, $id)
-    {
-        if (!$request->user()->is_admin) {
-            return Article::mine($request->user()->id)->findOrFail($id);
-        }
-
-        return Article::findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param ArticleRequest $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(ArticleRequest $request, $id)
-    {
-        $article = Article::findOrFail($id);
-
-        $data = $request->validated();
-        $data['slug'] = Str::slug($data['title']);
-        $article->update($data);
-
-        return response()->json($article, 200);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * 관리자가 Course 를 비활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로  되어야 함.)
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @throws \Throwable
      */
     public function delete($id)
     {
-        $article = Article::findOrFail($id);
+        DB::beginTransaction();
 
-        $article->delete();
+        try {
 
+            // These are all "Soft Delete".
+            Course::find($id)->delete();
+            Enrollment::where('course_id', $id)->delete();
+            Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->delete();
+
+            DB::commit();
+
+        }catch (\Throwable $e){
+            DB::rollBack();
+            throw $e;
+        }
+        return response([], 200);
+    }
+
+    /**
+     *
+     * 관리자가 Course 를  활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로 되어야 함.)
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @throws \Throwable
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            Course::find($id)->restore();
+            Enrollment::where('course_id', $id)->restore();
+            Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->restore();
+
+            DB::commit();
+
+        }catch (\Throwable $e){
+            DB::rollBack();
+            throw $e;
+        }
         return response([], 200);
     }
 }

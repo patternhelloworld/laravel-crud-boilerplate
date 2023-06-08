@@ -8,13 +8,15 @@ services:
     tty: true
     working_dir: /var/www/app
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "${HOST_IP}:host-gateway"
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - HOST_IP=${HOST_IP}
     environment:
-      XDEBUG_CONFIG: "idekey=IDE_DEBUG"
-      PHP_IDE_CONFIG: "serverName=laravel_react_app"
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
+      PHP_IDE_CONFIG: "serverName=laravel-crud-boilerplate"
     volumes:
       - .:/var/www/app
     depends_on:
@@ -36,6 +38,7 @@ services:
       MYSQL_USER: tester
       MYSQL_ROOT_PASSWORD: test1235
       MYSQL_PASSWORD: test1235
+      MYSQL_INIT_COMMAND: "--transaction-isolation=READ-COMMITTED"
     ports:
       - 3333:3306
     volumes:

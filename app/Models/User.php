@@ -60,4 +60,10 @@ class User extends Authenticatable implements CanResetPassword
     {
         return $this->hasMany(Enrollment::class);
     }
+
+    public function lessons()
+    {
+        // User has Many enrollments and each enrollment has many lessons.
+        return $this->hasManyThrough(Lesson::class, Enrollment::class, 'student_id', 'enrollment_id');
+    }
 }
