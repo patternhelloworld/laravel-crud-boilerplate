@@ -15,6 +15,8 @@ class Course extends Model
     use SoftDeletes;
     use HasFactory;
 
+    protected $perPage = 2;
+
     /**
      * The table associated with the model.
      *
@@ -22,7 +24,7 @@ class Course extends Model
      */
     protected $table = 'courses';
 
-    protected $fillable = ['students_id', 'course_id', ];
+    protected $fillable = ['students_id', 'course_id',];
 
     /**
      * The attributes that should be mutated to dates.
@@ -65,7 +67,7 @@ class Course extends Model
 
     public static function getAvailableCourses(string $language = null, string $type = null): ?\Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = self::query()->where('available', true);
+        $query = self::query()->where('deleted_at', null);
 
         if ($language) {
             $query->where('language', $language);
@@ -75,10 +77,14 @@ class Course extends Model
             $query->where('type', $type);
         }
 
-        return $query->latest()->paginate();
+        $now = now();
+
+        // DB 와 서버 모두 UTC
+        return $query->where('available_from', '<=', $now)
+            ->where('available_until', '>=', $now)->latest()->paginate();
     }
 
-    public static function getAvailableOne(string $id = null)
+    public static function getAvailableOne(int $id = null)
     {
         $now = now();
 
@@ -86,4 +92,5 @@ class Course extends Model
             ->where('available_until', '>=', $now)->find($id);
 
     }
+
 }
