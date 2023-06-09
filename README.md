@@ -32,6 +32,7 @@ For me, on WSL2,
 - It is automatically up as running `docker-compose up -d` above. 
 - If you need to persist data continually, just uncomment `# ./.docker/db/data:/var/lib/mysql` AND comment `./.docker/db/dump.sql:/docker-entrypoint-initdb.d/dump.sql` on the docker-compose.yml.
 - The transaction isolation level is at 'READ-COMMITTED' on the docker-compose.yml.
+    - If you consider the safety of 'gap-lock' or something, set it to 'REPEATABLE-READ' on the docker-compose.yml,
 
 ## Debugging
 On the 'docker-compose.yml', 
@@ -45,6 +46,30 @@ Additionally, set the port to be 9002.
 
 ## Test APIs
 Postman API files are on `./reference/postman`
+
+## PHP Source Codes
+
+These are what I have done and they all are on `./reference/postman`.
+
+```
+Api/Auth/LoginController/login
+Api/CourseController/index (Get all paginated courses, TO DO : check paginated parameters)
+Api/CourseController/delete (Admin : activate course)
+Api/CourseController/restore (Admin : deactivate course)
+Api/LessonController/store (Lesson : Start, End)
+```
+
+The term "NOT exist" means it could be soft-deleted or could NOT exist.
+```json
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "course_id": [
+            "The course_id (course id) does NOT exist."
+        ]
+    }
+}
+```
 
 ## Test Codes
 
