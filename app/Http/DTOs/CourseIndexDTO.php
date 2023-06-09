@@ -7,8 +7,8 @@ use Spatie\DataTransferObject\DataTransferObject;
 
 class CourseIndexDTO extends DataTransferObject
 {
-    private $language;
-    private $type;
+    public $language;
+    public $type;
 
     public static function fromRequest(CourseIndexRequest $request): CourseIndexDTO
     {

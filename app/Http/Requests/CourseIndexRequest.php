@@ -28,4 +28,19 @@ class CourseIndexRequest extends FormRequest
             'type' => ['nullable', 'in:Voice,Video,Chat']
         ];
     }
+
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'language.in' => 'The selected language is invalid.',
+            'type.in' => 'The selected type is invalid.',
+        ];
+    }
+
 }

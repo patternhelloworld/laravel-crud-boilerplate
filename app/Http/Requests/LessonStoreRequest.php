@@ -36,4 +36,17 @@ class LessonStoreRequest extends FormRequest
             'recording' => ['nullable', new RecordingNotAvailableStatusStart]
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'status.required' => 'The status field is required.',
+            'status.in' => 'The selected status is invalid. Valid values are Start or End.',
+        ];
+    }
 }
