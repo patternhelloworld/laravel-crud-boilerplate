@@ -40,22 +40,24 @@ class CourseController extends Controller
         try {
 
             // These are all "Soft Delete".
-            Course::find($id)->delete();
-            Enrollment::where('course_id', $id)->delete();
-            Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->delete();
+            Course::query()->where('id', $id)->delete();
+            Enrollment::query()->where('course_id', $id)->delete();
+            Lesson::query()->whereIn('enrollment_id',
+                Enrollment::withTrashed()->where('course_id', $id)->get()->pluck('id')->toArray())->delete();
 
             DB::commit();
 
-        }catch (\Throwable $e){
+        }
+        catch (\Throwable $e){
             DB::rollBack();
             throw $e;
         }
-        return response([], 200);
+        return response(null, 200);
     }
 
     /**
      *
-     * 관리자가 Course 를  활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로 되어야 함.)
+     * 관리자가 Course 를 활성화 할 경우. (Middleware 에서 현재 사용자가 Admin 으로 되어야 함.)
      * @param $id
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Throwable
@@ -66,9 +68,10 @@ class CourseController extends Controller
 
         try {
 
-            Course::find($id)->restore();
-            Enrollment::where('course_id', $id)->restore();
-            Lesson::whereIn('enrollment_id', Enrollment::where('course_id', $id)->get()->pluck('id')->toArray())->restore();
+            Course::withTrashed()->where('id', $id)->restore();
+            Enrollment::withTrashed()->where('course_id', $id)->restore();
+            Lesson::withTrashed()->whereIn('enrollment_id',
+                Enrollment::withTrashed()->where('course_id', $id)->get()->pluck('id')->toArray())->restore();
 
             DB::commit();
 

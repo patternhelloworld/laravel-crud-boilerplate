@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Log;
 
 class Lesson extends Model
 {
@@ -22,7 +23,7 @@ class Lesson extends Model
      */
     protected $table = 'lessons';
 
-    protected $fillable = ['enrollment_id'];
+    protected $fillable = ['enrollment_id', 'status', 'recording', 'result'];
 
     /**
      * The attributes that should be cast to native types.

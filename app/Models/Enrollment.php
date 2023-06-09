@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Log;
 
 class Enrollment extends Model
 {
+    use SoftDeletes;
     use HasFactory;
 
     /**
@@ -70,4 +72,5 @@ class Enrollment extends Model
     {
         return static::where('course_id', $course_id)->where('student_id', $student_id)->first();
     }
+
 }
