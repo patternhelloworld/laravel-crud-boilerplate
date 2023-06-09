@@ -21,4 +21,4 @@ COPY ./.docker/*.ini /usr/local/etc/php/conf.d/
 # Expose ports and start php-fpm server
 EXPOSE 9000
 
-ENTRYPOINT if [ ! -d 'vendor' ]; then composer install; fi  && php artisan key:gen && chgrp -R www-data ./ && chmod -R 775 bootstrap/cache/ storage/ && composer dump-autoload && php artisan config:clear && php-fpm
+ENTRYPOINT if [ ! -d 'vendor' ]; then composer install; fi  && php artisan key:gen && chgrp -R www-data ./ && chmod -R 775 bootstrap/cache/ storage/ && composer dump-autoload && php artisan config:clear && php artisan passport:keys --force && php-fpm
