@@ -18,6 +18,8 @@ $api_version = config('api.api_version');
 
 Route::group(["prefix" => "{$api_version}"], function() {
 
+    Route::get('/health', [\App\Http\Controllers\Api\HealthCheckController::class, 'index']);
+
     Route::post('login', 'Auth\LoginController@login');
 
     // register auth routes
